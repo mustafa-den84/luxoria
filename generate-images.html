@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Placeholder Images</title>
+</head>
+<body>
+    <h1>Generating Placeholder Images...</h1>
+    <canvas id="canvas" style="display: none;"></canvas>
+    <script>
+        function generatePlaceholder(text, filename, bgColor, textColor) {
+            const canvas = document.getElementById('canvas');
+            canvas.width = 400;
+            canvas.height = 300;
+            const ctx = canvas.getContext('2d');
+            
+            // Background
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Text
+            ctx.fillStyle = textColor;
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+            
+            // Download
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // Generate images
+        setTimeout(() => {
+            generatePlaceholder('شركة عقارية', 'placeholder-company.png', '#4ECDC4', '#2D3436');
+            setTimeout(() => {
+                generatePlaceholder('عقار فاخر', 'placeholder-estate.png', '#FF6B6B', '#FFFFFF');
+                setTimeout(() => {
+                    generatePlaceholder('لوكسوريا', 'logo.png', '#FF6B6B', '#FFFFFF');
+                    document.body.innerHTML = '<h1>Images generated successfully!</h1>';
+                }, 500);
+            }, 500);
+        }, 500);
+    </script>
+</body>
+</html>

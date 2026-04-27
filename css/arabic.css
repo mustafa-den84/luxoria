@@ -1,0 +1,125 @@
+/* Luxoria Real Estate Platform - Arabic RTL Styles */
+
+html[dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+}
+
+/* RTL Layout Adjustments */
+html[dir="rtl"] .logo {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .nav {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .search-box {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .card-info {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .close {
+    left: auto;
+    right: 20px;
+}
+
+html[dir="rtl"] .filters {
+    flex-direction: row-reverse;
+}
+
+/* RTL Typography */
+html[dir="rtl"] body {
+    font-family: 'Tajawal', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* RTL Margin and Padding Adjustments */
+html[dir="rtl"] .logo img {
+    margin-left: 10px;
+    margin-right: 0;
+}
+
+html[dir="rtl"] .nav-btn {
+    margin-left: 10px;
+    margin-right: 0;
+}
+
+html[dir="rtl"] .card-content {
+    text-align: right;
+}
+
+/* RTL Form Elements */
+html[dir="rtl"] input,
+html[dir="rtl"] select,
+html[dir="rtl"] textarea {
+    text-align: right;
+}
+
+/* RTL Modal */
+html[dir="rtl"] .modal-content {
+    text-align: right;
+}
+
+/* RTL Dashboard */
+html[dir="rtl"] .dashboard-actions {
+    align-items: flex-end;
+}
+
+/* RTL Specific for Mobile */
+@media only screen and (max-width: 768px) {
+    html[dir="rtl"] .logo {
+        flex-direction: column;
+    }
+    
+    html[dir="rtl"] .logo img {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    
+    html[dir="rtl"] .nav {
+        flex-direction: row;
+    }
+    
+    html[dir="rtl"] .search-box {
+        flex-direction: column;
+    }
+    
+    html[dir="rtl"] .filters {
+        flex-direction: column;
+    }
+}
+
+/* RTL Icon Adjustments */
+html[dir="rtl"] .arrow-left::before {
+    content: '←';
+    margin-left: 5px;
+}
+
+html[dir="rtl"] .arrow-right::before {
+    content: '→';
+    margin-left: 5px;
+}
+
+/* RTL Scrollbar */
+html[dir="rtl"] *::-webkit-scrollbar {
+    width: 8px;
+}
+
+html[dir="rtl"] *::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+html[dir="rtl"] *::-webkit-scrollbar-thumb {
+    background: var(--secondary);
+    border-radius: 4px;
+}
+
+/* RTL Focus States */
+html[dir="rtl"] input:focus,
+html[dir="rtl"] select:focus,
+html[dir="rtl"] textarea:focus {
+    text-align: right;
+}

@@ -1,0 +1,194 @@
+/* Luxoria Real Estate Platform - Mobile Styles */
+
+@media only screen and (max-width: 768px) {
+    /* Header */
+    .header .container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .logo {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .nav {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .nav-btn {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+    
+    /* Hero Section */
+    .hero {
+        padding: 40px 15px;
+    }
+    
+    .hero h2 {
+        font-size: 1.5rem;
+    }
+    
+    .hero p {
+        font-size: 1rem;
+    }
+    
+    .search-box {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .search-box input {
+        padding: 12px 15px;
+    }
+    
+    .search-box button {
+        padding: 12px 20px;
+    }
+    
+    /* Section */
+    .section {
+        padding: 30px 15px;
+    }
+    
+    .section h2 {
+        font-size: 1.4rem;
+    }
+    
+    .filters {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .filters select {
+        width: 100%;
+        padding: 12px 15px;
+    }
+    
+    /* Grid */
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .card {
+        border-radius: 10px;
+    }
+    
+    .card-image {
+        height: 180px;
+    }
+    
+    .card-content {
+        padding: 15px;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .card-description {
+        font-size: 0.9rem;
+    }
+    
+    .card-price {
+        font-size: 1rem;
+    }
+    
+    /* Featured Section */
+    .featured {
+        padding: 30px 15px;
+    }
+    
+    .featured h2 {
+        font-size: 1.4rem;
+    }
+    
+    /* Modal */
+    .modal-content {
+        padding: 20px;
+        width: 95%;
+        max-height: 85vh;
+    }
+    
+    .modal-content h2 {
+        font-size: 1.3rem;
+    }
+    
+    .modal-content input,
+    .modal-content select,
+    .modal-content textarea {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .modal-content button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+    
+    .dashboard-actions button {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+    
+    /* Touch-friendly elements */
+    button,
+    input,
+    select,
+    textarea {
+        min-height: 44px;
+    }
+    
+    /* Container */
+    .container {
+        padding: 0 15px;
+    }
+    
+    /* Footer */
+    .footer {
+        padding: 15px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Touch optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .nav-btn:hover,
+    .search-box button:hover,
+    .modal-content button:hover,
+    .dashboard-actions button:hover {
+        transform: none;
+    }
+    
+    .nav-btn:active,
+    .search-box button:active,
+    .modal-content button:active,
+    .dashboard-actions button:active {
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+}
+
+/* Small mobile devices */
+@media only screen and (max-width: 360px) {
+    .logo h1 {
+        font-size: 1.2rem;
+    }
+    
+    .nav-btn {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .hero h2 {
+        font-size: 1.3rem;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+    }
+}

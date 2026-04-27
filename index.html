@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxoria - Real Estate Platform</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link rel="stylesheet" href="css/arabic.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="assets/images/logo.svg" alt="Luxoria">
+                <h1>Luxoria</h1>
+            </div>
+            <nav class="nav">
+                <button class="nav-btn" onclick="showSection('companies')">الشركات</button>
+                <button class="nav-btn" onclick="showSection('estates')">العقارات</button>
+                <button class="nav-btn" onclick="showLogin()" id="loginBtn">تسجيل الدخول</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h2>منصتك الممتازة للعقارات</h2>
+                <p>اكتشف أفضل الشركات والعقارات في منطقتك</p>
+                <div class="search-box">
+                    <input type="text" id="mainSearch" placeholder="ابحث عن عقارات أو شركات...">
+                    <button onclick="performSearch()">بحث</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Companies Section -->
+        <section id="companies-section" class="section hidden">
+            <div class="container">
+                <h2>الشركات العقارية</h2>
+                <div class="filters">
+                    <select id="cityFilter" onchange="filterCompanies()">
+                        <option value="">كل المدن</option>
+                        <option value="الرياض">الرياض</option>
+                        <option value="جدة">جدة</option>
+                        <option value="مكة المكرمة">مكة المكرمة</option>
+                        <option value="المدينة المنورة">المدينة المنورة</option>
+                    </select>
+                    <select id="sortBy" onchange="sortCompanies()">
+                        <option value="name">الاسم (أ-ي)</option>
+                        <option value="rating">التقييم</option>
+                        <option value="newest">الأحدث</option>
+                    </select>
+                </div>
+                <div id="companies-list" class="grid">
+                    <!-- Companies will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Estates Section -->
+        <section id="estates-section" class="section hidden">
+            <div class="container">
+                <h2>العقارات المتاحة</h2>
+                <div class="filters">
+                    <select id="typeFilter" onchange="filterEstates()">
+                        <option value="">كل الأنواع</option>
+                        <option value="apartment">شقة</option>
+                        <option value="villa">فيلا</option>
+                        <option value="house">منزل</option>
+                        <option value="land">أرض</option>
+                        <option value="commercial">تجاري</option>
+                    </select>
+                    <select id="purposeFilter" onchange="filterEstates()">
+                        <option value="">الكل</option>
+                        <option value="sale">للبيع</option>
+                        <option value="rent">للإيجار</option>
+                    </select>
+                    <select id="priceSort" onchange="sortEstates()">
+                        <option value="name">الاسم</option>
+                        <option value="price-low">السعر (منخفض-مرتفع)</option>
+                        <option value="price-high">السعر (مرتفع-منخفض)</option>
+                        <option value="area">المساحة</option>
+                        <option value="newest">الأحدث</option>
+                    </select>
+                </div>
+                <div id="estates-list" class="grid">
+                    <!-- Estates will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Section -->
+        <section class="featured">
+            <div class="container">
+                <h2>عقارات مميزة</h2>
+                <div id="featured-list" class="grid">
+                    <!-- Featured estates will be loaded here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Luxoria. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" onclick="closeLogin()">&times;</span>
+            <h2>تسجيل الدخول</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <input type="text" id="username" placeholder="اسم المستخدم" required>
+                <input type="password" id="password" placeholder="كلمة المرور" required>
+                <button type="submit">دخول</button>
+            </form>
+            <div id="loginError" class="error hidden"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard Modal -->
+    <div id="dashboardModal" class="modal hidden">
+        <div class="modal-content dashboard">
+            <span class="close" onclick="closeDashboard()">&times;</span>
+            <h2>لوحة التحكم</h2>
+            <div id="userInfo"></div>
+            <div class="dashboard-actions">
+                <button onclick="showAddCompany()">إضافة شركة</button>
+                <button onclick="showAddEstate()">إضافة عقار</button>
+                <button onclick="showAdminPanel()" id="adminBtn" class="hidden">لوحة الإدارة</button>
+                <button onclick="logout()">تسجيل الخروج</button>
+            </div>
+            <div id="dashboardContent"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/companies.js"></script>
+    <script src="js/estates.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
