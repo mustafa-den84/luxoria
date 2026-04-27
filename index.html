@@ -44,18 +44,30 @@
             <div class="container">
                 <h2>الشركات العقارية</h2>
                 <div class="filters">
-                    <select id="cityFilter" onchange="filterCompanies()">
-                        <option value="">كل المدن</option>
-                        <option value="الرياض">الرياض</option>
-                        <option value="جدة">جدة</option>
-                        <option value="مكة المكرمة">مكة المكرمة</option>
-                        <option value="المدينة المنورة">المدينة المنورة</option>
-                    </select>
-                    <select id="sortBy" onchange="sortCompanies()">
-                        <option value="name">الاسم (أ-ي)</option>
-                        <option value="rating">التقييم</option>
-                        <option value="newest">الأحدث</option>
-                    </select>
+                    <div class="filter-card selected" data-group="cityFilter" onclick="selectSimpleFilter(event, 'cityFilter', '', 'كل المدن')">
+                        <span class="filter-card-title">كل المدن</span>
+                    </div>
+                    <div class="filter-card" data-group="cityFilter" onclick="selectSimpleFilter(event, 'cityFilter', 'الرياض', 'الرياض')">
+                        <span class="filter-card-title">الرياض</span>
+                    </div>
+                    <div class="filter-card" data-group="cityFilter" onclick="selectSimpleFilter(event, 'cityFilter', 'جدة', 'جدة')">
+                        <span class="filter-card-title">جدة</span>
+                    </div>
+                    <div class="filter-card" data-group="cityFilter" onclick="selectSimpleFilter(event, 'cityFilter', 'مكة المكرمة', 'مكة المكرمة')">
+                        <span class="filter-card-title">مكة المكرمة</span>
+                    </div>
+                    <div class="filter-card" data-group="cityFilter" onclick="selectSimpleFilter(event, 'cityFilter', 'المدينة المنورة', 'المدينة المنورة')">
+                        <span class="filter-card-title">المدينة المنورة</span>
+                    </div>
+                    <div class="filter-card selected" data-group="sortBy" onclick="selectSimpleFilter(event, 'sortBy', 'name', 'الاسم')">
+                        <span class="filter-card-title">الاسم</span>
+                    </div>
+                    <div class="filter-card" data-group="sortBy" onclick="selectSimpleFilter(event, 'sortBy', 'rating', 'التقييم')">
+                        <span class="filter-card-title">التقييم</span>
+                    </div>
+                    <div class="filter-card" data-group="sortBy" onclick="selectSimpleFilter(event, 'sortBy', 'newest', 'الأحدث')">
+                        <span class="filter-card-title">الأحدث</span>
+                    </div>
                 </div>
                 <div id="companies-list" class="grid">
                     <!-- Companies will be loaded here -->
@@ -68,26 +80,48 @@
             <div class="container">
                 <h2>العقارات المتاحة</h2>
                 <div class="filters">
-                    <select id="typeFilter" onchange="filterEstates()">
-                        <option value="">كل الأنواع</option>
-                        <option value="apartment">شقة</option>
-                        <option value="villa">فيلا</option>
-                        <option value="house">منزل</option>
-                        <option value="land">أرض</option>
-                        <option value="commercial">تجاري</option>
-                    </select>
-                    <select id="purposeFilter" onchange="filterEstates()">
-                        <option value="">الكل</option>
-                        <option value="sale">للبيع</option>
-                        <option value="rent">للإيجار</option>
-                    </select>
-                    <select id="priceSort" onchange="sortEstates()">
-                        <option value="name">الاسم</option>
-                        <option value="price-low">السعر (منخفض-مرتفع)</option>
-                        <option value="price-high">السعر (مرتفع-منخفض)</option>
-                        <option value="area">المساحة</option>
-                        <option value="newest">الأحدث</option>
-                    </select>
+                    <div class="filter-card selected" data-group="typeFilter" onclick="selectSimpleFilter(event, 'typeFilter', '', 'كل الأنواع')">
+                        <span class="filter-card-title">كل الأنواع</span>
+                    </div>
+                    <div class="filter-card" data-group="typeFilter" onclick="selectSimpleFilter(event, 'typeFilter', 'apartment', 'شقة')">
+                        <span class="filter-card-title">شقة</span>
+                    </div>
+                    <div class="filter-card" data-group="typeFilter" onclick="selectSimpleFilter(event, 'typeFilter', 'villa', 'فيلا')">
+                        <span class="filter-card-title">فيلا</span>
+                    </div>
+                    <div class="filter-card" data-group="typeFilter" onclick="selectSimpleFilter(event, 'typeFilter', 'house', 'منزل')">
+                        <span class="filter-card-title">منزل</span>
+                    </div>
+                    <div class="filter-card" data-group="typeFilter" onclick="selectSimpleFilter(event, 'typeFilter', 'land', 'أرض')">
+                        <span class="filter-card-title">أرض</span>
+                    </div>
+                    <div class="filter-card" data-group="typeFilter" onclick="selectSimpleFilter(event, 'typeFilter', 'commercial', 'تجاري')">
+                        <span class="filter-card-title">تجاري</span>
+                    </div>
+                    <div class="filter-card selected" data-group="purposeFilter" onclick="selectSimpleFilter(event, 'purposeFilter', '', 'الكل')">
+                        <span class="filter-card-title">الكل</span>
+                    </div>
+                    <div class="filter-card" data-group="purposeFilter" onclick="selectSimpleFilter(event, 'purposeFilter', 'sale', 'للبيع')">
+                        <span class="filter-card-title">للبيع</span>
+                    </div>
+                    <div class="filter-card" data-group="purposeFilter" onclick="selectSimpleFilter(event, 'purposeFilter', 'rent', 'للإيجار')">
+                        <span class="filter-card-title">للإيجار</span>
+                    </div>
+                    <div class="filter-card selected" data-group="priceSort" onclick="selectSimpleFilter(event, 'priceSort', 'name', 'الاسم')">
+                        <span class="filter-card-title">الاسم</span>
+                    </div>
+                    <div class="filter-card" data-group="priceSort" onclick="selectSimpleFilter(event, 'priceSort', 'price-low', 'السعر ↑')">
+                        <span class="filter-card-title">السعر ↑</span>
+                    </div>
+                    <div class="filter-card" data-group="priceSort" onclick="selectSimpleFilter(event, 'priceSort', 'price-high', 'السعر ↓')">
+                        <span class="filter-card-title">السعر ↓</span>
+                    </div>
+                    <div class="filter-card" data-group="priceSort" onclick="selectSimpleFilter(event, 'priceSort', 'area', 'المساحة')">
+                        <span class="filter-card-title">المساحة</span>
+                    </div>
+                    <div class="filter-card" data-group="priceSort" onclick="selectSimpleFilter(event, 'priceSort', 'newest', 'الأحدث')">
+                        <span class="filter-card-title">الأحدث</span>
+                    </div>
                 </div>
                 <div id="estates-list" class="grid">
                     <!-- Estates will be loaded here -->

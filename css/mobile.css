@@ -59,43 +59,107 @@
     }
     
     .filters {
-        flex-direction: column;
-        gap: 10px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
     }
-    
-    .filters select {
-        width: 100%;
-        padding: 12px 15px;
+
+    .filter-card {
+        padding: 6px 4px;
+    }
+
+    .filter-card-title {
+        font-size: 0.75rem;
+    }
+
+    /* City filter group - Blue */
+    .filter-card[data-group="cityFilter"] {
+        background: #e8f0fe;
+        border-color: #c5d9f7;
+    }
+
+    .filter-card[data-group="cityFilter"].selected {
+        background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+        border-color: #1a73e8;
+    }
+
+    /* Sort filter group - Green */
+    .filter-card[data-group="sortBy"] {
+        background: #e6f4ea;
+        border-color: #b8e0c4;
+    }
+
+    .filter-card[data-group="sortBy"].selected {
+        background: linear-gradient(135deg, #1e8e3e 0%, #0d652d 100%);
+        border-color: #1e8e3e;
+    }
+
+    /* Type filter group - Orange */
+    .filter-card[data-group="typeFilter"] {
+        background: #fef3e0;
+        border-color: #f5c97a;
+    }
+
+    .filter-card[data-group="typeFilter"].selected {
+        background: linear-gradient(135deg, #e8710a 0%, #c05500 100%);
+        border-color: #e8710a;
+    }
+
+    /* Purpose filter group - Pink */
+    .filter-card[data-group="purposeFilter"] {
+        background: #fce8f3;
+        border-color: #f5a3c4;
+    }
+
+    .filter-card[data-group="purposeFilter"].selected {
+        background: linear-gradient(135deg, #d81b60 0%, #a00037 100%);
+        border-color: #d81b60;
+    }
+
+    /* Price sort filter group - Purple */
+    .filter-card[data-group="priceSort"] {
+        background: #f3e8fd;
+        border-color: #d1a3f5;
+    }
+
+    .filter-card[data-group="priceSort"].selected {
+        background: linear-gradient(135deg, #7b1fa2 0%, #4a0072 100%);
+        border-color: #7b1fa2;
     }
     
     /* Grid */
     .grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
     }
-    
+
     .card {
-        border-radius: 10px;
+        border-radius: 8px;
     }
-    
+
     .card-image {
-        height: 180px;
+        height: 100px;
     }
-    
+
     .card-content {
-        padding: 15px;
+        padding: 8px;
     }
-    
+
     .card-title {
-        font-size: 1.1rem;
+        font-size: 0.85rem;
+        margin-bottom: 3px;
     }
-    
+
     .card-description {
-        font-size: 0.9rem;
+        font-size: 0.75rem;
+        margin-bottom: 6px;
     }
-    
+
+    .card-info {
+        margin-top: 6px;
+    }
+
     .card-price {
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
     
     /* Featured Section */
@@ -133,6 +197,111 @@
     .dashboard-actions button {
         padding: 12px;
         font-size: 0.9rem;
+    }
+
+    /* Admin Panel Mobile Styles */
+    .modal-content.dashboard {
+        max-width: 100%;
+        width: 98%;
+        padding: 12px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .admin-tabs {
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 12px;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 8px;
+    }
+
+    .tab-btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        min-width: 70px;
+    }
+
+    .admin-tab {
+        padding: 12px;
+    }
+
+    .admin-tab h3 {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+
+    .user-item {
+        flex-direction: column;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .company-item, .estate-item {
+        flex-direction: column;
+    }
+
+    .item-thumbnail {
+        width: 100%;
+        height: 100px;
+        margin-left: 0;
+        margin-bottom: 8px;
+    }
+
+    .item-info {
+        margin-right: 0;
+        margin-bottom: 8px;
+        width: 100%;
+    }
+
+    .item-name {
+        font-size: 1rem;
+        margin-bottom: 6px;
+    }
+
+    .item-details {
+        font-size: 0.85rem;
+        margin-bottom: 3px;
+    }
+
+    .item-desc {
+        font-size: 0.75rem;
+        margin-top: 6px;
+    }
+
+    .user-actions {
+        flex-direction: row;
+        width: 100%;
+        gap: 6px;
+        min-width: auto;
+    }
+
+    .user-actions button {
+        flex: 1;
+        padding: 8px 10px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
+
+    .search-container input {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+
+    .current-image {
+        padding: 8px;
+        margin-bottom: 12px;
+    }
+
+    .current-image img {
+        max-width: 80px;
+    }
+
+    .close {
+        width: 32px;
+        height: 32px;
+        font-size: 24px;
     }
     
     /* Touch-friendly elements */

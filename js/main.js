@@ -2,12 +2,201 @@
 
 // Global variables
 let currentSection = 'home';
+let adminCompanies = [];
+let adminEstates = [];
+
+// Filter values (multi-select arrays)
+let cityFilterValues = [''];
+let sortByValue = 'name';
+let typeFilterValues = [''];
+let purposeFilterValues = [''];
+let priceSortValue = 'name';
 
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded');
     initializeApp();
+    initAutoHideHeader();
 });
+
+// Auto-hide header on scroll
+function initAutoHideHeader() {
+    let lastScrollY = window.scrollY;
+    const header = document.querySelector('.header');
+
+    window.addEventListener('scroll', function() {
+        const currentScrollY = window.scrollY;
+
+        if (currentScrollY > lastScrollY && currentScrollY > 80) {
+            header.classList.add('hidden');
+        } else {
+            header.classList.remove('hidden');
+        }
+
+        lastScrollY = currentScrollY;
+    }, { passive: true });
+}
+
+// Toggle filter card dropdown
+function toggleFilterCard(cardId) {
+    const card = document.getElementById(cardId);
+    card.classList.toggle('open');
+}
+
+// Select simple filter (colored card) - multi-select for filters, single-select for sorts
+function selectSimpleFilter(event, filterId, value, title) {
+    event.stopPropagation();
+
+    const clickedCard = event.target.closest('.filter-card');
+    const isSortGroup = (filterId === 'sortBy' || filterId === 'priceSort');
+
+    if (isSortGroup) {
+        // Single select for sort groups
+        const allCards = clickedCard.parentElement.querySelectorAll('.filter-card[data-group="' + filterId + '"]');
+        allCards.forEach(card => card.classList.remove('selected'));
+        clickedCard.classList.add('selected');
+
+        if (filterId === 'sortBy') {
+            sortByValue = value;
+        } else if (filterId === 'priceSort') {
+            priceSortValue = value;
+        }
+    } else {
+        // Multi-select for filter groups
+        const isAllOption = (value === '');
+
+        if (isAllOption) {
+            // If "all" is clicked, deselect everything else and select only "all"
+            const allCards = clickedCard.parentElement.querySelectorAll('.filter-card[data-group="' + filterId + '"]');
+            allCards.forEach(card => card.classList.remove('selected'));
+            clickedCard.classList.add('selected');
+
+            if (filterId === 'cityFilter') {
+                cityFilterValues = [''];
+            } else if (filterId === 'typeFilter') {
+                typeFilterValues = [''];
+            } else if (filterId === 'purposeFilter') {
+                purposeFilterValues = [''];
+            }
+        } else {
+            // Deselect "all" option if a specific option is clicked
+            const allCards = clickedCard.parentElement.querySelectorAll('.filter-card[data-group="' + filterId + '"]');
+            allCards.forEach(card => {
+                const onclickAttr = card.getAttribute('onclick') || '';
+                if (onclickAttr.includes("''") || onclickAttr.includes(", '',")) {
+                    card.classList.remove('selected');
+                }
+            });
+
+            // Toggle the clicked card
+            if (clickedCard.classList.contains('selected')) {
+                clickedCard.classList.remove('selected');
+                // Remove from values
+                if (filterId === 'cityFilter') {
+                    cityFilterValues = cityFilterValues.filter(v => v !== value);
+                    if (cityFilterValues.length === 0) cityFilterValues = [''];
+                } else if (filterId === 'typeFilter') {
+                    typeFilterValues = typeFilterValues.filter(v => v !== value);
+                    if (typeFilterValues.length === 0) typeFilterValues = [''];
+                } else if (filterId === 'purposeFilter') {
+                    purposeFilterValues = purposeFilterValues.filter(v => v !== value);
+                    if (purposeFilterValues.length === 0) purposeFilterValues = [''];
+                }
+            } else {
+                clickedCard.classList.add('selected');
+                // Add to values
+                if (filterId === 'cityFilter') {
+                    cityFilterValues = cityFilterValues.filter(v => v !== '');
+                    cityFilterValues.push(value);
+                } else if (filterId === 'typeFilter') {
+                    typeFilterValues = typeFilterValues.filter(v => v !== '');
+                    typeFilterValues.push(value);
+                } else if (filterId === 'purposeFilter') {
+                    purposeFilterValues = purposeFilterValues.filter(v => v !== '');
+                    purposeFilterValues.push(value);
+                }
+            }
+
+            // If nothing selected, re-select "all"
+            if (filterId === 'cityFilter' && cityFilterValues.length === 0) {
+                cityFilterValues = [''];
+                allCards.forEach(card => {
+                    const onclickAttr = card.getAttribute('onclick') || '';
+                    if (onclickAttr.includes("''") || onclickAttr.includes(", '',")) {
+                        card.classList.add('selected');
+                    }
+                });
+            } else if (filterId === 'typeFilter' && typeFilterValues.length === 0) {
+                typeFilterValues = [''];
+                allCards.forEach(card => {
+                    const onclickAttr = card.getAttribute('onclick') || '';
+                    if (onclickAttr.includes("''") || onclickAttr.includes(", '',")) {
+                        card.classList.add('selected');
+                    }
+                });
+            } else if (filterId === 'purposeFilter' && purposeFilterValues.length === 0) {
+                purposeFilterValues = [''];
+                allCards.forEach(card => {
+                    const onclickAttr = card.getAttribute('onclick') || '';
+                    if (onclickAttr.includes("''") || onclickAttr.includes(", '',")) {
+                        card.classList.add('selected');
+                    }
+                });
+            }
+        }
+    }
+
+    // Trigger filter function
+    if (filterId === 'cityFilter' || filterId === 'sortBy') {
+        filterCompanies();
+    } else if (filterId === 'typeFilter' || filterId === 'purposeFilter') {
+        filterEstates();
+    } else if (filterId === 'priceSort') {
+        sortEstates();
+    }
+}
+
+// Select filter option
+function selectFilterOption(event, filterId, value, title) {
+    event.stopPropagation();
+
+    // Update title
+    const titleElement = document.getElementById(filterId + 'Title');
+    if (titleElement) {
+        titleElement.textContent = title;
+    }
+
+    // Update filter value
+    if (filterId === 'cityFilter') {
+        cityFilterValue = value;
+    } else if (filterId === 'sortBy') {
+        sortByValue = value;
+    } else if (filterId === 'typeFilter') {
+        typeFilterValue = value;
+    } else if (filterId === 'purposeFilter') {
+        purposeFilterValue = value;
+    } else if (filterId === 'priceSort') {
+        priceSortValue = value;
+    }
+
+    // Update selected state
+    const card = document.getElementById(filterId + 'Card');
+    const options = card.querySelectorAll('.filter-option');
+    options.forEach(option => option.classList.remove('selected'));
+    event.target.classList.add('selected');
+
+    // Close card
+    card.classList.remove('open');
+
+    // Trigger filter function
+    if (filterId === 'cityFilter' || filterId === 'sortBy') {
+        filterCompanies();
+    } else if (filterId === 'typeFilter' || filterId === 'purposeFilter') {
+        filterEstates();
+    } else if (filterId === 'priceSort') {
+        sortEstates();
+    }
+}
 
 async function initializeApp() {
     console.log('Luxoria app initializing...');
@@ -169,12 +358,29 @@ function showAddCompany() {
             <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
             <h2>إضافة شركة جديدة</h2>
             <form id="addCompanyForm" onsubmit="handleAddCompany(event)">
-                <input type="text" id="companyName" placeholder="اسم الشركة (عربي)" required>
-                <textarea id="companyDescription" placeholder="وصف الشركة (عربي)" rows="3"></textarea>
-                <input type="text" id="companyPhone" placeholder="رقم الهاتف" required>
-                <input type="text" id="companyWhatsapp" placeholder="رقم الواتساب">
+                <label>اسم الشركة (عربي)</label>
+                <input type="text" id="companyName" placeholder="اسم الشركة" required>
+                <label>وصف الشركة (عربي)</label>
+                <textarea id="companyDescription" placeholder="وصف الشركة" rows="3"></textarea>
+                <label>المدينة</label>
                 <input type="text" id="companyCity" placeholder="المدينة" required>
-                <label>صورة الشعار:</label>
+                <label>الهاتف</label>
+                <input type="tel" id="companyPhone" placeholder="رقم الهاتف">
+                <label>الواتساب</label>
+                <input type="tel" id="companyWhatsapp" placeholder="رقم الواتساب">
+                <label>التقييم</label>
+                <input type="number" id="companyRating" value="0" step="0.1" min="0" max="5">
+                <label>مميزة</label>
+                <select id="companyFeatured">
+                    <option value="false">لا</option>
+                    <option value="true">نعم</option>
+                </select>
+                <label>موثوقة</label>
+                <select id="companyVerified">
+                    <option value="false">لا</option>
+                    <option value="true">نعم</option>
+                </select>
+                <label>شعار الشركة</label>
                 <input type="file" id="companyLogoFile" accept="image/*">
                 <input type="text" id="companyLogo" placeholder="أو رابط الشعار">
                 <button type="submit">إضافة</button>
@@ -214,13 +420,13 @@ async function handleAddCompany(event) {
     const companyData = {
         name_ar: document.getElementById('companyName').value,
         description_ar: document.getElementById('companyDescription').value,
+        city_ar: document.getElementById('companyCity').value,
         phone: document.getElementById('companyPhone').value,
         whatsapp: document.getElementById('companyWhatsapp').value,
-        city_ar: document.getElementById('companyCity').value,
-        logo_url: logo_url,
-        rating: 0,
-        verified: false,
-        featured: false
+        rating: parseFloat(document.getElementById('companyRating').value) || 0,
+        featured: document.getElementById('companyFeatured').value === 'true',
+        verified: document.getElementById('companyVerified').value === 'true',
+        logo_url: logo_url
     };
     
     try {
@@ -245,8 +451,11 @@ function showAddEstate() {
             <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
             <h2>إضافة عقار جديد</h2>
             <form id="addEstateForm" onsubmit="handleAddEstate(event)">
-                <input type="text" id="estateTitle" placeholder="عنوان العقار (عربي)" required>
-                <textarea id="estateDescription" placeholder="وصف العقار (عربي)" rows="3"></textarea>
+                <label>عنوان العقار (عربي)</label>
+                <input type="text" id="estateTitle" placeholder="عنوان العقار" required>
+                <label>وصف العقار (عربي)</label>
+                <textarea id="estateDescription" placeholder="وصف العقار" rows="3"></textarea>
+                <label>النوع</label>
                 <select id="estateType" required>
                     <option value="">نوع العقار</option>
                     <option value="apartment">شقة</option>
@@ -255,15 +464,35 @@ function showAddEstate() {
                     <option value="land">أرض</option>
                     <option value="commercial">تجاري</option>
                 </select>
+                <label>الغرض</label>
                 <select id="estatePurpose" required>
                     <option value="">الغرض</option>
                     <option value="sale">للبيع</option>
                     <option value="rent">للإيجار</option>
                 </select>
+                <label>السعر</label>
                 <input type="number" id="estatePrice" placeholder="السعر" required>
-                <input type="number" id="estateArea" placeholder="المساحة (متر مربع)" required>
+                <label>العملة</label>
+                <select id="estateCurrency">
+                    <option value="SAR">ريال سعودي</option>
+                    <option value="USD">دولار</option>
+                </select>
+                <label>المساحة (م²)</label>
+                <input type="number" id="estateArea" placeholder="المساحة" required>
+                <label>المدينة</label>
                 <input type="text" id="estateCity" placeholder="المدينة" required>
-                <label>صور العقار:</label>
+                <label>الحالة</label>
+                <select id="estateStatus">
+                    <option value="available">متاح</option>
+                    <option value="sold">مباع</option>
+                    <option value="rented">مؤجر</option>
+                </select>
+                <label>مميز</label>
+                <select id="estateFeatured">
+                    <option value="false">لا</option>
+                    <option value="true">نعم</option>
+                </select>
+                <label>صور العقار</label>
                 <input type="file" id="estateImagesFile" accept="image/*" multiple>
                 <input type="text" id="estateImages" placeholder="أو روابط الصور (مفصولة بفاصلة)">
                 <button type="submit">إضافة</button>
@@ -308,12 +537,12 @@ async function handleAddEstate(event) {
         type: document.getElementById('estateType').value,
         purpose: document.getElementById('estatePurpose').value,
         price: parseFloat(document.getElementById('estatePrice').value),
-        currency: 'USD',
+        currency: document.getElementById('estateCurrency').value,
         area: parseFloat(document.getElementById('estateArea').value),
         city_ar: document.getElementById('estateCity').value,
-        images: images,
-        featured: false,
-        status: 'available'
+        status: document.getElementById('estateStatus').value,
+        featured: document.getElementById('estateFeatured').value === 'true',
+        images: images
     };
     
     try {
@@ -359,11 +588,17 @@ function showAdminPanel() {
                 <div id="companiesTab" class="admin-tab">
                     <h3>إدارة الشركات</h3>
                     <button onclick="showAddCompanyModal()">إضافة شركة جديدة</button>
+                    <div class="search-container">
+                        <input type="text" id="companySearchInput" placeholder="🔍 بحث عن شركة..." oninput="filterAdminCompanies()">
+                    </div>
                     <div id="companiesList"></div>
                 </div>
                 <div id="estatesTab" class="admin-tab">
                     <h3>إدارة العقارات</h3>
                     <button onclick="showAddEstateModal()">إضافة عقار جديد</button>
+                    <div class="search-container">
+                        <input type="text" id="estateSearchInput" placeholder="🔍 بحث عن عقار..." oninput="filterAdminEstates()">
+                    </div>
                     <div id="estatesList"></div>
                 </div>
                 <div id="statsTab" class="admin-tab">
@@ -391,8 +626,12 @@ async function loadAdminData() {
         const stats = await database.getStatistics();
         const users = await auth.getAllUsers();
         const currentUser = auth.getCurrentUser();
-        const companies = await database.getAllCompanies();
-        const estates = await database.getAllEstates();
+        const companies = await database.getCompanies();
+        const estates = await database.getEstates();
+        
+        // Store data globally for filtering
+        adminCompanies = companies;
+        adminEstates = estates;
         
         document.getElementById('statistics').innerHTML = `
             <p>إجمالي الشركات: ${stats.totalCompanies}</p>
@@ -411,25 +650,61 @@ async function loadAdminData() {
             </div>
         `).join('');
 
-        document.getElementById('companiesList').innerHTML = companies.map(company => `
-            <div class="user-item">
-                <p><strong>${company.name_ar}</strong> - ${company.city_ar}</p>
+        document.getElementById('companiesList').innerHTML = companies.length === 0
+            ? '<p class="no-items">لا توجد شركات حالياً</p>'
+            : companies.map(company => {
+                let logoSrc = company.logo_url || 'assets/images/placeholder-company.svg';
+                if (company.logo_url && company.logo_url.startsWith('image_')) {
+                    const localImage = database.getImageFromStorage(company.logo_url);
+                    if (localImage) logoSrc = localImage;
+                }
+                return `
+            <div class="user-item company-item">
+                <div class="item-thumbnail">
+                    <img src="${logoSrc}" alt="${company.name_ar}" onerror="this.src='assets/images/placeholder-company.svg'">
+                </div>
+                <div class="item-info">
+                    <p class="item-name"><strong>${company.name_ar}</strong></p>
+                    <p class="item-details">المدينة: ${company.city_ar}</p>
+                    <p class="item-details">الهاتف: ${company.phone}</p>
+                    ${company.description_ar ? `<p class="item-desc">${company.description_ar.substring(0, 100)}...</p>` : ''}
+                </div>
                 <div class="user-actions">
-                    <button onclick="editCompany('${company.id}')">تعديل</button>
-                    <button onclick="deleteCompany('${company.id}')">حذف</button>
+                    <button class="edit-btn" onclick="editCompany('${company.id}')">✏️ تعديل</button>
+                    <button class="delete-btn" onclick="deleteCompany('${company.id}')">🗑️ حذف</button>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
 
-        document.getElementById('estatesList').innerHTML = estates.map(estate => `
-            <div class="user-item">
-                <p><strong>${estate.title_ar}</strong> - ${estate.price?.toLocaleString()} USD</p>
-                <div class="user-actions">
-                    <button onclick="editEstate('${estate.id}')">تعديل</button>
-                    <button onclick="deleteEstate('${estate.id}')">حذف</button>
+        document.getElementById('estatesList').innerHTML = estates.length === 0
+            ? '<p class="no-items">لا توجد عقارات حالياً</p>'
+            : estates.map(estate => {
+                let imageSrc = 'assets/images/placeholder-estate.svg';
+                if (estate.images && estate.images.length > 0) {
+                    imageSrc = estate.images[0];
+                    if (imageSrc.startsWith('image_')) {
+                        const localImage = database.getImageFromStorage(imageSrc);
+                        if (localImage) imageSrc = localImage;
+                    }
+                }
+                return `<div class="user-item estate-item">
+                <div class="item-thumbnail">
+                    <img src="${imageSrc}" alt="${estate.title_ar}" onerror="this.src='assets/images/placeholder-estate.svg'">
                 </div>
-            </div>
-        `).join('');
+                <div class="item-info">
+                    <p class="item-name"><strong>${estate.title_ar}</strong></p>
+                    <p class="item-details">السعر: ${estate.price?.toLocaleString()} USD</p>
+                    <p class="item-details">المساحة: ${estate.area} م²</p>
+                    <p class="item-details">المدينة: ${estate.city_ar}</p>
+                    <p class="item-details">النوع: ${estate.type} | الغرض: ${estate.purpose}</p>
+                    ${estate.description_ar ? `<p class="item-desc">${estate.description_ar.substring(0, 100)}...</p>` : ''}
+                </div>
+                <div class="user-actions">
+                    <button class="edit-btn" onclick="editEstate('${estate.id}')">✏️ تعديل</button>
+                    <button class="delete-btn" onclick="deleteEstate('${estate.id}')">🗑️ حذف</button>
+                </div>
+            </div>`;
+            }).join('');
 
         // Pre-fill profile form
         document.getElementById('editUsername').value = currentUser.username;
@@ -446,10 +721,89 @@ function showAdminTab(tabName) {
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    
+
     // Show selected tab
     document.getElementById(`${tabName}Tab`).classList.add('active');
     event.target.classList.add('active');
+}
+
+// Search filtering functions for admin panel
+function filterAdminCompanies() {
+    const searchTerm = document.getElementById('companySearchInput').value.toLowerCase();
+    const filteredCompanies = adminCompanies.filter(company =>
+        company.name_ar.toLowerCase().includes(searchTerm) ||
+        company.city_ar.toLowerCase().includes(searchTerm) ||
+        company.phone.includes(searchTerm) ||
+        (company.description_ar && company.description_ar.toLowerCase().includes(searchTerm))
+    );
+
+    document.getElementById('companiesList').innerHTML = filteredCompanies.length === 0
+        ? '<p class="no-items">لا توجد نتائج مطابقة</p>'
+        : filteredCompanies.map(company => {
+            let logoSrc = company.logo_url || 'assets/images/placeholder-company.svg';
+            if (company.logo_url && company.logo_url.startsWith('image_')) {
+                const localImage = database.getImageFromStorage(company.logo_url);
+                if (localImage) logoSrc = localImage;
+            }
+            return `
+            <div class="user-item company-item">
+                <div class="item-thumbnail">
+                    <img src="${logoSrc}" alt="${company.name_ar}" onerror="this.src='assets/images/placeholder-company.svg'">
+                </div>
+                <div class="item-info">
+                    <p class="item-name"><strong>${company.name_ar}</strong></p>
+                    <p class="item-details">المدينة: ${company.city_ar}</p>
+                    <p class="item-details">الهاتف: ${company.phone}</p>
+                    ${company.description_ar ? `<p class="item-desc">${company.description_ar.substring(0, 100)}...</p>` : ''}
+                </div>
+                <div class="user-actions">
+                    <button class="edit-btn" onclick="editCompany('${company.id}')">✏️ تعديل</button>
+                    <button class="delete-btn" onclick="deleteCompany('${company.id}')">🗑️ حذف</button>
+                </div>
+            </div>
+        `}).join('');
+}
+
+function filterAdminEstates() {
+    const searchTerm = document.getElementById('estateSearchInput').value.toLowerCase();
+    const filteredEstates = adminEstates.filter(estate =>
+        estate.title_ar.toLowerCase().includes(searchTerm) ||
+        estate.city_ar.toLowerCase().includes(searchTerm) ||
+        estate.type.toLowerCase().includes(searchTerm) ||
+        estate.purpose.toLowerCase().includes(searchTerm) ||
+        (estate.description_ar && estate.description_ar.toLowerCase().includes(searchTerm))
+    );
+
+    document.getElementById('estatesList').innerHTML = filteredEstates.length === 0
+        ? '<p class="no-items">لا توجد نتائج مطابقة</p>'
+        : filteredEstates.map(estate => {
+            let imageSrc = 'assets/images/placeholder-estate.svg';
+            if (estate.images && estate.images.length > 0) {
+                imageSrc = estate.images[0];
+                if (imageSrc.startsWith('image_')) {
+                    const localImage = database.getImageFromStorage(imageSrc);
+                    if (localImage) imageSrc = localImage;
+                }
+            }
+            return `
+            <div class="user-item estate-item">
+                <div class="item-thumbnail">
+                    <img src="${imageSrc}" alt="${estate.title_ar}" onerror="this.src='assets/images/placeholder-estate.svg'">
+                </div>
+                <div class="item-info">
+                    <p class="item-name"><strong>${estate.title_ar}</strong></p>
+                    <p class="item-details">السعر: ${estate.price?.toLocaleString()} USD</p>
+                    <p class="item-details">المساحة: ${estate.area} م²</p>
+                    <p class="item-details">المدينة: ${estate.city_ar}</p>
+                    <p class="item-details">النوع: ${estate.type} | الغرض: ${estate.purpose}</p>
+                    ${estate.description_ar ? `<p class="item-desc">${estate.description_ar.substring(0, 100)}...</p>` : ''}
+                </div>
+                <div class="user-actions">
+                    <button class="edit-btn" onclick="editEstate('${estate.id}')">✏️ تعديل</button>
+                    <button class="delete-btn" onclick="deleteEstate('${estate.id}')">🗑️ حذف</button>
+                </div>
+            </div>
+        `}).join('');
 }
 
 function showAddUserModal() {
@@ -569,23 +923,47 @@ async function deleteUser(userId) {
 function editCompany(companyId) {
     database.getCompanyById(companyId).then(company => {
         if (company) {
+            let logoSrc = company.logo_url || 'assets/images/placeholder-company.svg';
+            if (company.logo_url && company.logo_url.startsWith('image_')) {
+                const localImage = database.getImageFromStorage(company.logo_url);
+                if (localImage) logoSrc = localImage;
+            }
             const modal = document.createElement('div');
             modal.className = 'modal show';
             modal.innerHTML = `
                 <div class="modal-content">
                     <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
                     <h2>تعديل الشركة</h2>
+                    <div class="current-image">
+                        <p>الشعار الحالي:</p>
+                        <img src="${logoSrc}" alt="شعار الشركة" style="max-width: 150px; border-radius: 10px; margin: 10px 0;">
+                    </div>
                     <form onsubmit="handleEditCompany(event, '${companyId}')">
                         <label>اسم الشركة</label>
                         <input type="text" id="editCompanyName" value="${company.name_ar}" required>
                         <label>الوصف</label>
                         <textarea id="editCompanyDescription" rows="3">${company.description_ar || ''}</textarea>
-                        <label>الهاتف</label>
-                        <input type="tel" id="editCompanyPhone" value="${company.phone}" required>
-                        <label>الواتساب</label>
-                        <input type="tel" id="editCompanyWhatsapp" value="${company.whatsapp || ''}">
                         <label>المدينة</label>
                         <input type="text" id="editCompanyCity" value="${company.city_ar}" required>
+                        <label>الهاتف</label>
+                        <input type="tel" id="editCompanyPhone" value="${company.phone || ''}">
+                        <label>الواتساب</label>
+                        <input type="tel" id="editCompanyWhatsapp" value="${company.whatsapp || ''}">
+                        <label>التقييم</label>
+                        <input type="number" id="editCompanyRating" value="${company.rating || 0}" step="0.1" min="0" max="5">
+                        <label>مميزة</label>
+                        <select id="editCompanyFeatured">
+                            <option value="false" ${!company.featured ? 'selected' : ''}>لا</option>
+                            <option value="true" ${company.featured ? 'selected' : ''}>نعم</option>
+                        </select>
+                        <label>موثوقة</label>
+                        <select id="editCompanyVerified">
+                            <option value="false" ${!company.verified ? 'selected' : ''}>لا</option>
+                            <option value="true" ${company.verified ? 'selected' : ''}>نعم</option>
+                        </select>
+                        <label>تغيير الشعار (اختياري)</label>
+                        <input type="file" id="editCompanyLogoFile" accept="image/*">
+                        <input type="text" id="editCompanyLogo" placeholder="أو رابط الشعار الجديد">
                         <button type="submit">تحديث</button>
                     </form>
                 </div>
@@ -597,14 +975,46 @@ function editCompany(companyId) {
 
 async function handleEditCompany(event, companyId) {
     event.preventDefault();
-    
+
+    const logoFile = document.getElementById('editCompanyLogoFile').files[0];
+    const logoUrlInput = document.getElementById('editCompanyLogo').value;
+
+    let logo_url = logoUrlInput;
+
+    // Upload file if provided
+    if (logoFile) {
+        try {
+            const timestamp = Date.now();
+            const path = `companies/logos/${timestamp}_${logoFile.name}`;
+            logo_url = await database.uploadImage(logoFile, path);
+            showSuccess('تم رفع الصورة بنجاح');
+        } catch (error) {
+            console.error('Upload error:', error);
+            if (error.message.includes('مساحة التخزين ممتلئة')) {
+                const cleared = database.clearOldImages();
+                showError(`مساحة التخزين ممتلئة. تم مسح ${cleared} صورة قديمة. حاول مرة أخرى.`);
+            } else {
+                showError('خطأ في رفع الصورة');
+            }
+            return;
+        }
+    }
+
     const companyData = {
         name_ar: document.getElementById('editCompanyName').value,
         description_ar: document.getElementById('editCompanyDescription').value,
+        city_ar: document.getElementById('editCompanyCity').value,
         phone: document.getElementById('editCompanyPhone').value,
         whatsapp: document.getElementById('editCompanyWhatsapp').value,
-        city_ar: document.getElementById('editCompanyCity').value
+        rating: parseFloat(document.getElementById('editCompanyRating').value) || 0,
+        featured: document.getElementById('editCompanyFeatured').value === 'true',
+        verified: document.getElementById('editCompanyVerified').value === 'true'
     };
+
+    // Only update logo_url if a new one was provided
+    if (logo_url) {
+        companyData.logo_url = logo_url;
+    }
     
     try {
         await database.updateCompany(companyId, companyData);
@@ -631,12 +1041,32 @@ async function deleteCompany(companyId) {
 function editEstate(estateId) {
     database.getEstateById(estateId).then(estate => {
         if (estate) {
+            let imagesHtml = '';
+            if (estate.images && estate.images.length > 0) {
+                imagesHtml = estate.images.map((img, index) => {
+                    let imgSrc = img;
+                    if (img.startsWith('image_')) {
+                        const localImage = database.getImageFromStorage(img);
+                        if (localImage) imgSrc = localImage;
+                    }
+                    return `<img src="${imgSrc}" alt="صورة ${index + 1}" style="max-width: 150px; border-radius: 10px; margin: 5px;">`;
+                }).join('');
+            } else {
+                imagesHtml = '<p style="color: #a0a0a0;">لا توجد صور حالياً</p>';
+            }
+
             const modal = document.createElement('div');
             modal.className = 'modal show';
             modal.innerHTML = `
                 <div class="modal-content">
                     <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
                     <h2>تعديل العقار</h2>
+                    <div class="current-image">
+                        <p>الصور الحالية:</p>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0;">
+                            ${imagesHtml}
+                        </div>
+                    </div>
                     <form onsubmit="handleEditEstate(event, '${estateId}')">
                         <label>العنوان</label>
                         <input type="text" id="editEstateTitle" value="${estate.title_ar}" required>
@@ -646,6 +1076,7 @@ function editEstate(estateId) {
                         <select id="editEstateType" required>
                             <option value="apartment" ${estate.type === 'apartment' ? 'selected' : ''}>شقة</option>
                             <option value="villa" ${estate.type === 'villa' ? 'selected' : ''}>فيلا</option>
+                            <option value="house" ${estate.type === 'house' ? 'selected' : ''}>منزل</option>
                             <option value="land" ${estate.type === 'land' ? 'selected' : ''}>أرض</option>
                             <option value="commercial" ${estate.type === 'commercial' ? 'selected' : ''}>تجاري</option>
                         </select>
@@ -656,10 +1087,29 @@ function editEstate(estateId) {
                         </select>
                         <label>السعر</label>
                         <input type="number" id="editEstatePrice" value="${estate.price}" required>
-                        <label>المساحة</label>
+                        <label>العملة</label>
+                        <select id="editEstateCurrency">
+                            <option value="SAR" ${estate.currency === 'SAR' ? 'selected' : ''}>ريال سعودي</option>
+                            <option value="USD" ${estate.currency === 'USD' ? 'selected' : ''}>دولار</option>
+                        </select>
+                        <label>المساحة (م²)</label>
                         <input type="number" id="editEstateArea" value="${estate.area}" required>
                         <label>المدينة</label>
                         <input type="text" id="editEstateCity" value="${estate.city_ar}" required>
+                        <label>الحالة</label>
+                        <select id="editEstateStatus">
+                            <option value="available" ${estate.status === 'available' ? 'selected' : ''}>متاح</option>
+                            <option value="sold" ${estate.status === 'sold' ? 'selected' : ''}>مباع</option>
+                            <option value="rented" ${estate.status === 'rented' ? 'selected' : ''}>مؤجر</option>
+                        </select>
+                        <label>مميز</label>
+                        <select id="editEstateFeatured">
+                            <option value="false" ${!estate.featured ? 'selected' : ''}>لا</option>
+                            <option value="true" ${estate.featured ? 'selected' : ''}>نعم</option>
+                        </select>
+                        <label>إضافة صور جديدة (اختياري)</label>
+                        <input type="file" id="editEstateImagesFile" accept="image/*" multiple>
+                        <input type="text" id="editEstateImages" placeholder="أو روابط الصور الجديدة (مفصولة بفاصلة)">
                         <button type="submit">تحديث</button>
                     </form>
                 </div>
@@ -671,15 +1121,54 @@ function editEstate(estateId) {
 
 async function handleEditEstate(event, estateId) {
     event.preventDefault();
-    
+
+    const imageFiles = document.getElementById('editEstateImagesFile').files;
+    const imagesInput = document.getElementById('editEstateImages').value;
+
+    // Get existing estate data to preserve current images
+    const existingEstate = await database.getEstateById(estateId);
+    let images = existingEstate ? existingEstate.images : [];
+
+    // Add new images from URL input
+    if (imagesInput) {
+        const newImages = imagesInput.split(',').map(url => url.trim());
+        images = [...images, ...newImages];
+    }
+
+    // Upload files if provided
+    if (imageFiles.length > 0) {
+        try {
+            for (let i = 0; i < imageFiles.length; i++) {
+                const timestamp = Date.now();
+                const path = `estates/images/${timestamp}_${i}_${imageFiles[i].name}`;
+                const url = await database.uploadImage(imageFiles[i], path);
+                images.push(url);
+            }
+            showSuccess('تم رفع الصور بنجاح');
+        } catch (error) {
+            console.error('Upload error:', error);
+            if (error.message.includes('مساحة التخزين ممتلئة')) {
+                const cleared = database.clearOldImages();
+                showError(`مساحة التخزين ممتلئة. تم مسح ${cleared} صورة قديمة. حاول مرة أخرى.`);
+            } else {
+                showError('خطأ في رفع الصور');
+            }
+            return;
+        }
+    }
+
     const estateData = {
         title_ar: document.getElementById('editEstateTitle').value,
         description_ar: document.getElementById('editEstateDescription').value,
         type: document.getElementById('editEstateType').value,
         purpose: document.getElementById('editEstatePurpose').value,
         price: parseFloat(document.getElementById('editEstatePrice').value),
+        currency: document.getElementById('editEstateCurrency').value,
         area: parseFloat(document.getElementById('editEstateArea').value),
-        city_ar: document.getElementById('editEstateCity').value
+        city_ar: document.getElementById('editEstateCity').value,
+        status: document.getElementById('editEstateStatus').value,
+        featured: document.getElementById('editEstateFeatured').value === 'true',
+        images: images
     };
     
     try {
@@ -740,32 +1229,39 @@ function setupRealTimeSearch() {
 
 // Filters
 function filterCompanies() {
-    const cityFilter = document.getElementById('cityFilter').value;
     const filters = {};
-    if (cityFilter) {
-        filters.city_ar = cityFilter;
+    if (cityFilterValues.length > 0 && !cityFilterValues.includes('')) {
+        filters.cities = cityFilterValues;
     }
     companiesManager.loadCompanies(filters);
+    if (sortByValue) {
+        companiesManager.companies = searchManager.sortCompanies(companiesManager.companies, sortByValue);
+        companiesManager.renderCompanies();
+    }
 }
 
 function sortCompanies() {
-    const sortBy = document.getElementById('sortBy').value;
-    companiesManager.companies = searchManager.sortCompanies(companiesManager.companies, sortBy);
+    companiesManager.companies = searchManager.sortCompanies(companiesManager.companies, sortByValue);
     companiesManager.renderCompanies();
 }
 
 function filterEstates() {
-    const typeFilter = document.getElementById('typeFilter').value;
-    const purposeFilter = document.getElementById('purposeFilter').value;
     const filters = {};
-    if (typeFilter) filters.type = typeFilter;
-    if (purposeFilter) filters.purpose = purposeFilter;
+    if (typeFilterValues.length > 0 && !typeFilterValues.includes('')) {
+        filters.types = typeFilterValues;
+    }
+    if (purposeFilterValues.length > 0 && !purposeFilterValues.includes('')) {
+        filters.purposes = purposeFilterValues;
+    }
     estatesManager.loadEstates(filters);
+    if (priceSortValue) {
+        estatesManager.estates = searchManager.sortEstates(estatesManager.estates, priceSortValue);
+        estatesManager.renderEstates();
+    }
 }
 
 function sortEstates() {
-    const sortBy = document.getElementById('priceSort').value;
-    estatesManager.estates = searchManager.sortEstates(estatesManager.estates, sortBy);
+    estatesManager.estates = searchManager.sortEstates(estatesManager.estates, priceSortValue);
     estatesManager.renderEstates();
 }
 
