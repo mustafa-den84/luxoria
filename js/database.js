@@ -5,6 +5,17 @@ class Database {
         this.companiesCollection = db.collection('companies');
         this.estatesCollection = db.collection('estates');
         this.usersCollection = db.collection('users');
+        this.githubRepo = 'mustafa-den84/luxoria';
+        this.githubBranch = 'main';
+    }
+
+    // GitHub token management
+    getGithubToken() {
+        return localStorage.getItem('github_token') || '';
+    }
+
+    setGithubToken(token) {
+        localStorage.setItem('github_token', token);
     }
 
     // Generic get document
@@ -244,36 +255,92 @@ class Database {
         }
     }
 
-    // Image Upload (Local)
+    // Image Upload (GitHub)
     async uploadImage(file, path) {
+        const token = this.getGithubToken();
+        
+        // If no GitHub token, fall back to localStorage
+        if (!token) {
+            return this.uploadImageLocal(file, path);
+        }
+
         try {
-            // Convert file to base64 for local storage
+            // Compress image if needed (max ~900KB for GitHub API)
+            const base64 = await this.fileToBase64(file);
+            
+            const githubPath = `uploads/${path}`;
+            const url = `https://api.github.com/repos/${this.githubRepo}/contents/${githubPath}`;
+            
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Upload image: ${path}`,
+                    content: base64,
+                    branch: this.githubBranch
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                if (response.status === 401) {
+                    throw new Error('رمز GitHub غير صالح. يرجى تحديث الرمز من الإعدادات.');
+                }
+                if (response.status === 403) {
+                    throw new Error('تجاوز حد GitHub API. حاول مرة أخرى لاحقاً.');
+                }
+                throw new Error(errorData.message || 'خطأ في رفع الصورة إلى GitHub');
+            }
+
+            const data = await response.json();
+            // Return the raw GitHub URL for direct image access
+            return data.content.download_url;
+        } catch (error) {
+            console.error('GitHub upload error:', error);
+            throw error;
+        }
+    }
+
+    // Convert file to base64 (without the data URL prefix)
+    fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64 = reader.result.split(',')[1];
+                resolve(base64);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Fallback: upload to localStorage
+    async uploadImageLocal(file, path) {
+        try {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = () => {
                     const base64 = reader.result;
-                    // Store in localStorage with a key
                     const key = `image_${Date.now()}`;
                     try {
                         localStorage.setItem(key, base64);
-                        resolve(key); // Return the key instead of URL
+                        resolve(key);
                     } catch (quotaError) {
                         if (quotaError.name === 'QuotaExceededError') {
-                            console.error('Storage quota exceeded');
-                            reject(new Error('مساحة التخزين ممتلئة. يرجى استخدام رابط للصورة بدلاً من رفع الملف.'));
+                            reject(new Error('مساحة التخزين ممتلئة. يرجى إضافة رمز GitHub من الإعدادات لرفع الصور.'));
                         } else {
                             reject(quotaError);
                         }
                     }
                 };
-                reader.onerror = (error) => {
-                    console.error('FileReader error:', error);
-                    reject(error);
-                };
+                reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
         } catch (error) {
-            console.error('Upload image error:', error);
+            console.error('Local upload error:', error);
             throw error;
         }
     }

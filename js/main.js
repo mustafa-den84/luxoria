@@ -584,6 +584,7 @@ function showAdminPanel() {
                     <button class="tab-btn" onclick="showAdminTab('companies')">الشركات</button>
                     <button class="tab-btn" onclick="showAdminTab('estates')">العقارات</button>
                     <button class="tab-btn" onclick="showAdminTab('stats')">الإحصائيات</button>
+                    <button class="tab-btn" onclick="showAdminTab('settings')">الإعدادات</button>
                     <button class="tab-btn" onclick="showAdminTab('profile')">الملف الشخصي</button>
                 </div>
                 <div id="usersTab" class="admin-tab active">
@@ -610,6 +611,30 @@ function showAdminPanel() {
                 <div id="statsTab" class="admin-tab">
                     <h3>إحصائيات</h3>
                     <div id="statistics"></div>
+                </div>
+                <div id="settingsTab" class="admin-tab">
+                    <h3>إعدادات رفع الصور</h3>
+                    <p style="color: #aaa; margin-bottom: 15px;">لرفع الصور إلى GitHub مجاناً، تحتاج رمز الوصول الشخصي (Personal Access Token)</p>
+                    <div style="background: #16213e; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <p style="color: #8bc34a; font-weight: bold; margin-bottom: 8px;">كيفية الحصول على الرمز:</p>
+                        <ol style="color: #ccc; padding-right: 20px; line-height: 2;">
+                            <li>اذهب إلى GitHub.com → Settings</li>
+                            <li>اختر Developer settings</li>
+                            <li>اختر Personal access tokens → Tokens (classic)</li>
+                            <li>اضغط Generate new token</li>
+                            <li>اختر صلاحية <strong>repo</strong></li>
+                            <li>انسخ الرمز وألصقه هنا</li>
+                        </ol>
+                    </div>
+                    <form onsubmit="handleSaveGithubToken(event)">
+                        <label>رمز GitHub الشخصي</label>
+                        <input type="password" id="githubTokenInput" placeholder="ghp_xxxxxxxxxxxx" value="${database.getGithubToken()}">
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit">حفظ الرمز</button>
+                            <button type="button" onclick="testGithubToken()" style="background: linear-gradient(135deg, #00bcd4, #0097a7);">اختبار الاتصال</button>
+                        </div>
+                    </form>
+                    <div id="githubTokenStatus" style="margin-top: 10px;"></div>
                 </div>
                 <div id="profileTab" class="admin-tab">
                     <h3>تعديل الملف الشخصي</h3>
@@ -847,6 +872,42 @@ async function handleAddUser(event) {
         loadAdminData();
     } catch (error) {
         showError(error.message);
+    }
+}
+
+async function handleSaveGithubToken(event) {
+    event.preventDefault();
+    const token = document.getElementById('githubTokenInput').value.trim();
+    if (token) {
+        database.setGithubToken(token);
+        showSuccess('تم حفظ رمز GitHub بنجاح');
+    } else {
+        localStorage.removeItem('github_token');
+        showSuccess('تم حذف رمز GitHub. سيتم استخدام التخزين المحلي.');
+    }
+}
+
+async function testGithubToken() {
+    const token = document.getElementById('githubTokenInput').value.trim();
+    const statusEl = document.getElementById('githubTokenStatus');
+    if (!token) {
+        statusEl.innerHTML = '<p style="color: #ff7043;">الرجاء إدخال الرمز أولاً</p>';
+        return;
+    }
+    statusEl.innerHTML = '<p style="color: #8bc34a;">جاري الاختبار...</p>';
+    try {
+        const response = await fetch(`https://api.github.com/repos/${database.githubRepo}`, {
+            headers: { 'Authorization': `token ${token}` }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            database.setGithubToken(token);
+            statusEl.innerHTML = `<p style="color: #8bc34a;">✅ الاتصال ناجح! المستودع: ${data.full_name}</p>`;
+        } else {
+            statusEl.innerHTML = '<p style="color: #ff7043;">❌ الرمز غير صالح أو لا يملك صلاحية الوصول</p>';
+        }
+    } catch (error) {
+        statusEl.innerHTML = '<p style="color: #ff7043;">❌ خطأ في الاتصال بـ GitHub</p>';
     }
 }
 
