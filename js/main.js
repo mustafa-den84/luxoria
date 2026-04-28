@@ -477,8 +477,8 @@ function showAddEstate() {
                 <input type="number" id="estatePrice" placeholder="السعر" required>
                 <label>العملة</label>
                 <select id="estateCurrency">
-                    <option value="SAR">ريال سعودي</option>
-                    <option value="USD">دولار</option>
+                    <option value="USD">دولار أمريكي</option>
+                    <option value="SYP">ليرة سورية</option>
                 </select>
                 <label>المساحة (م²)</label>
                 <input type="number" id="estateArea" placeholder="المساحة" required>
@@ -542,7 +542,7 @@ async function handleAddEstate(event) {
         type: document.getElementById('estateType').value,
         purpose: document.getElementById('estatePurpose').value,
         price: parseFloat(document.getElementById('estatePrice').value),
-        currency: document.getElementById('estateCurrency').value,
+        currency: document.getElementById('estateCurrency').value || 'USD',
         area: parseFloat(document.getElementById('estateArea').value),
         city_ar: document.getElementById('estateCity').value,
         status: document.getElementById('estateStatus').value,
@@ -1098,8 +1098,8 @@ function editEstate(estateId) {
                         <input type="number" id="editEstatePrice" value="${estate.price}" required>
                         <label>العملة</label>
                         <select id="editEstateCurrency">
-                            <option value="SAR" ${estate.currency === 'SAR' ? 'selected' : ''}>ريال سعودي</option>
-                            <option value="USD" ${estate.currency === 'USD' ? 'selected' : ''}>دولار</option>
+                            <option value="USD" ${estate.currency === 'USD' ? 'selected' : ''}>دولار أمريكي</option>
+                            <option value="SYP" ${estate.currency === 'SYP' ? 'selected' : ''}>ليرة سورية</option>
                         </select>
                         <label>المساحة (م²)</label>
                         <input type="number" id="editEstateArea" value="${estate.area}" required>
@@ -1381,7 +1381,7 @@ function showEstateDetails(estateId) {
                     ${imagesHtml ? `<div class="detail-gallery">${imagesHtml}</div>` : ''}
                     <div class="detail-info">
                         <p>${estate.description_ar || ''}</p>
-                        <p><strong>السعر:</strong> ${estate.price?.toLocaleString()} ${estate.currency || 'USD'}</p>
+                        <p><strong>السعر:</strong> ${estate.price?.toLocaleString()} ${estate.currency === 'SYP' ? 'ليرة سورية' : 'دولار أمريكي'}</p>
                         <p><strong>المساحة:</strong> ${estate.area || 0} م²</p>
                         <p><strong>النوع:</strong> ${estate.type || ''}</p>
                         <p><strong>الغرض:</strong> ${estate.purpose === 'sale' ? 'للبيع' : estate.purpose === 'rent' ? 'للإيجار' : estate.purpose || ''}</p>

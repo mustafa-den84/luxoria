@@ -43,7 +43,7 @@ class EstatesManager {
                     <h3 class="card-title">${estate.title_ar}</h3>
                     <p class="card-description">${estate.description_ar || ''}</p>
                     <div class="card-info">
-                        <span class="card-price">${estate.price?.toLocaleString()} ${estate.currency || 'USD'}</span>
+                        <span class="card-price">${estate.price?.toLocaleString()} ${estate.currency === 'SYP' ? 'ل.س' : '$'}</span>
                         <span>${estate.area || 0} م²</span>
                     </div>
                     ${estate.link ? `<a href="${estate.link}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">🔗 الرابط</a>` : ''}
@@ -102,7 +102,7 @@ class EstatesManager {
                     <h3 class="card-title">${estate.title_ar}</h3>
                     <p class="card-description">${estate.description_ar || ''}</p>
                     <div class="card-info">
-                        <span class="card-price">${estate.price?.toLocaleString()} ${estate.currency || 'USD'}</span>
+                        <span class="card-price">${estate.price?.toLocaleString()} ${estate.currency === 'SYP' ? 'ل.س' : '$'}</span>
                         <span>${estate.city_ar || ''}</span>
                     </div>
                     ${estate.link ? `<a href="${estate.link}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">🔗 الرابط</a>` : ''}
