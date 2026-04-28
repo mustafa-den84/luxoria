@@ -25,14 +25,7 @@ class EstatesManager {
         }
 
         container.innerHTML = this.estates.map(estate => {
-            let imageSrc = estate.images?.[0] || 'assets/images/placeholder-estate.svg';
-            // Check if it's a local storage key
-            if (estate.images?.[0] && estate.images[0].startsWith('image_')) {
-                const localImage = database.getImageFromStorage(estate.images[0]);
-                if (localImage) {
-                    imageSrc = localImage;
-                }
-            }
+            const imageSrc = database.resolveImageUrl(estate.images?.[0]) || 'assets/images/placeholder-estate.svg';
             return `
             <div class="card" onclick="showEstateDetails('${estate.id}')">
                 <img src="${imageSrc}" 
@@ -84,14 +77,7 @@ class EstatesManager {
         }
 
         container.innerHTML = estates.map(estate => {
-            let imageSrc = estate.images?.[0] || 'assets/images/placeholder-estate.svg';
-            // Check if it's a local storage key
-            if (estate.images?.[0] && estate.images[0].startsWith('image_')) {
-                const localImage = database.getImageFromStorage(estate.images[0]);
-                if (localImage) {
-                    imageSrc = localImage;
-                }
-            }
+            const imageSrc = database.resolveImageUrl(estate.images?.[0]) || 'assets/images/placeholder-estate.svg';
             return `
             <div class="card" onclick="showEstateDetails('${estate.id}')">
                 <img src="${imageSrc}" 

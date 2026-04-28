@@ -350,6 +350,26 @@ class Database {
         return localStorage.getItem(key);
     }
 
+    // Resolve image URL - handles localStorage keys, GitHub URLs, and direct URLs
+    resolveImageUrl(url) {
+        if (!url) return '';
+        // localStorage key
+        if (url.startsWith('image_')) {
+            const localImage = this.getImageFromStorage(url);
+            return localImage || '';
+        }
+        // GitHub raw URL or any http URL - use directly
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url;
+        }
+        // Data URL
+        if (url.startsWith('data:')) {
+            return url;
+        }
+        // Relative path
+        return url;
+    }
+
     // Clear old images from localStorage
     clearOldImages() {
         const keys = [];

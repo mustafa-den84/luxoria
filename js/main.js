@@ -990,11 +990,7 @@ async function deleteUser(userId) {
 function editCompany(companyId) {
     database.getCompanyById(companyId).then(company => {
         if (company) {
-            let logoSrc = company.logo_url || 'assets/images/placeholder-company.svg';
-            if (company.logo_url && company.logo_url.startsWith('image_')) {
-                const localImage = database.getImageFromStorage(company.logo_url);
-                if (localImage) logoSrc = localImage;
-            }
+            const logoSrc = database.resolveImageUrl(company.logo_url) || 'assets/images/placeholder-company.svg';
             const modal = document.createElement('div');
             modal.className = 'modal show';
             modal.innerHTML = `
@@ -1114,12 +1110,8 @@ function editEstate(estateId) {
             let imagesHtml = '';
             if (estate.images && estate.images.length > 0) {
                 imagesHtml = estate.images.map((img, index) => {
-                    let imgSrc = img;
-                    if (img.startsWith('image_')) {
-                        const localImage = database.getImageFromStorage(img);
-                        if (localImage) imgSrc = localImage;
-                    }
-                    return `<img src="${imgSrc}" alt="صورة ${index + 1}" style="max-width: 150px; border-radius: 10px; margin: 5px;">`;
+                    const imgSrc = database.resolveImageUrl(img);
+                    return imgSrc ? `<img src="${imgSrc}" alt="صورة ${index + 1}" style="max-width: 150px; border-radius: 10px; margin: 5px;" onerror="this.style.display='none'">` : '';
                 }).join('');
             } else {
                 imagesHtml = '<p style="color: #a0a0a0;">لا توجد صور حالياً</p>';
@@ -1375,22 +1367,15 @@ function showError(message) {
 function showCompanyDetails(companyId) {
     database.getCompanyById(companyId).then(company => {
         if (company) {
-            let imageSrc = company.logo_url || 'assets/images/placeholder-company.svg';
-            // Check if it's a local storage key
-            if (company.logo_url && company.logo_url.startsWith('image_')) {
-                const localImage = database.getImageFromStorage(company.logo_url);
-                if (localImage) {
-                    imageSrc = localImage;
-                }
-            }
-            const logoLink = company.logo_url && company.logo_url.startsWith('http') ? company.logo_url : '';
+            const imageSrc = database.resolveImageUrl(company.logo_url) || 'assets/images/placeholder-company.svg';
+            const isLogoLinkable = company.logo_url && company.logo_url.startsWith('http');
             const modal = document.createElement('div');
             modal.className = 'modal show';
             modal.innerHTML = `
                 <div class="modal-content">
                     <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
                     <h2>${company.name_ar}</h2>
-                    ${logoLink ? `<a href="${logoLink}" target="_blank" rel="noopener"><img src="${imageSrc}" alt="${company.name_ar}" class="detail-image"></a>` : `<img src="${imageSrc}" alt="${company.name_ar}" class="detail-image">`}
+                    ${isLogoLinkable ? `<a href="${company.logo_url}" target="_blank" rel="noopener"><img src="${imageSrc}" alt="${company.name_ar}" class="detail-image"></a>` : `<img src="${imageSrc}" alt="${company.name_ar}" class="detail-image">`}
                     <div class="detail-info">
                         <p>${company.description_ar || ''}</p>
                         <p><strong>الهاتف:</strong> <a href="tel:${company.phone}">${company.phone}</a></p>
@@ -1409,26 +1394,16 @@ function showCompanyDetails(companyId) {
 function showEstateDetails(estateId) {
     database.getEstateById(estateId).then(estate => {
         if (estate) {
-            let imageSrc = estate.images?.[0] || 'assets/images/placeholder-estate.svg';
-            // Check if it's a local storage key
-            if (estate.images?.[0] && estate.images[0].startsWith('image_')) {
-                const localImage = database.getImageFromStorage(estate.images[0]);
-                if (localImage) {
-                    imageSrc = localImage;
-                }
-            }
+            const imageSrc = database.resolveImageUrl(estate.images?.[0]) || 'assets/images/placeholder-estate.svg';
             // Build images gallery
             let imagesHtml = '';
             if (estate.images && estate.images.length > 0) {
                 imagesHtml = estate.images.map((img, index) => {
-                    let imgSrc = img;
-                    if (img.startsWith('image_')) {
-                        const localImage = database.getImageFromStorage(img);
-                        if (localImage) imgSrc = localImage;
-                    }
-                    const imgLink = img.startsWith('http') ? img : '';
-                    return imgLink 
-                        ? `<a href="${imgLink}" target="_blank" rel="noopener"><img src="${imgSrc}" alt="صورة ${index + 1}" class="detail-gallery-img" onerror="this.style.display='none'"></a>`
+                    const imgSrc = database.resolveImageUrl(img);
+                    if (!imgSrc) return '';
+                    const isLinkable = img.startsWith('http');
+                    return isLinkable 
+                        ? `<a href="${img}" target="_blank" rel="noopener"><img src="${imgSrc}" alt="صورة ${index + 1}" class="detail-gallery-img" onerror="this.style.display='none'"></a>`
                         : `<img src="${imgSrc}" alt="صورة ${index + 1}" class="detail-gallery-img" onerror="this.style.display='none'">`;
                 }).join('');
             }

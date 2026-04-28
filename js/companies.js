@@ -25,15 +25,7 @@ class CompaniesManager {
         }
 
         container.innerHTML = this.companies.map(company => {
-            let imageSrc = company.logo_url || 'assets/images/placeholder-company.svg';
-            // Check if it's a local storage key
-            if (company.logo_url && company.logo_url.startsWith('image_')) {
-                const localImage = database.getImageFromStorage(company.logo_url);
-                if (localImage) {
-                    imageSrc = localImage;
-                }
-            }
-            const logoLink = company.logo_url ? (company.logo_url.startsWith('http') ? company.logo_url : imageSrc) : '';
+            const imageSrc = database.resolveImageUrl(company.logo_url) || 'assets/images/placeholder-company.svg';
             return `
             <div class="card" onclick="showCompanyDetails('${company.id}')">
                 <img src="${imageSrc}" 
