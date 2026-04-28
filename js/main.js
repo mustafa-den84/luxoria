@@ -380,6 +380,8 @@ function showAddCompany() {
                     <option value="false">لا</option>
                     <option value="true">نعم</option>
                 </select>
+                <label>رابط الموقع</label>
+                <input type="url" id="companyLink" placeholder="https://example.com">
                 <label>شعار الشركة</label>
                 <input type="file" id="companyLogoFile" accept="image/*">
                 <input type="text" id="companyLogo" placeholder="أو رابط الشعار">
@@ -426,6 +428,7 @@ async function handleAddCompany(event) {
         rating: parseFloat(document.getElementById('companyRating').value) || 0,
         featured: document.getElementById('companyFeatured').value === 'true',
         verified: document.getElementById('companyVerified').value === 'true',
+        link: document.getElementById('companyLink').value,
         logo_url: logo_url
     };
     
@@ -492,6 +495,8 @@ function showAddEstate() {
                     <option value="false">لا</option>
                     <option value="true">نعم</option>
                 </select>
+                <label>رابط العقار</label>
+                <input type="url" id="estateLink" placeholder="https://example.com">
                 <label>صور العقار</label>
                 <input type="file" id="estateImagesFile" accept="image/*" multiple>
                 <input type="text" id="estateImages" placeholder="أو روابط الصور (مفصولة بفاصلة)">
@@ -542,6 +547,7 @@ async function handleAddEstate(event) {
         city_ar: document.getElementById('estateCity').value,
         status: document.getElementById('estateStatus').value,
         featured: document.getElementById('estateFeatured').value === 'true',
+        link: document.getElementById('estateLink').value,
         images: images
     };
     
@@ -961,6 +967,8 @@ function editCompany(companyId) {
                             <option value="false" ${!company.verified ? 'selected' : ''}>لا</option>
                             <option value="true" ${company.verified ? 'selected' : ''}>نعم</option>
                         </select>
+                        <label>رابط الموقع</label>
+                        <input type="url" id="editCompanyLink" value="${company.link || ''}" placeholder="https://example.com">
                         <label>تغيير الشعار (اختياري)</label>
                         <input type="file" id="editCompanyLogoFile" accept="image/*">
                         <input type="text" id="editCompanyLogo" placeholder="أو رابط الشعار الجديد">
@@ -1008,7 +1016,8 @@ async function handleEditCompany(event, companyId) {
         whatsapp: document.getElementById('editCompanyWhatsapp').value,
         rating: parseFloat(document.getElementById('editCompanyRating').value) || 0,
         featured: document.getElementById('editCompanyFeatured').value === 'true',
-        verified: document.getElementById('editCompanyVerified').value === 'true'
+        verified: document.getElementById('editCompanyVerified').value === 'true',
+        link: document.getElementById('editCompanyLink').value
     };
 
     // Only update logo_url if a new one was provided
@@ -1107,6 +1116,8 @@ function editEstate(estateId) {
                             <option value="false" ${!estate.featured ? 'selected' : ''}>لا</option>
                             <option value="true" ${estate.featured ? 'selected' : ''}>نعم</option>
                         </select>
+                        <label>رابط العقار</label>
+                        <input type="url" id="editEstateLink" value="${estate.link || ''}" placeholder="https://example.com">
                         <label>إضافة صور جديدة (اختياري)</label>
                         <input type="file" id="editEstateImagesFile" accept="image/*" multiple>
                         <input type="text" id="editEstateImages" placeholder="أو روابط الصور الجديدة (مفصولة بفاصلة)">
@@ -1168,6 +1179,7 @@ async function handleEditEstate(event, estateId) {
         city_ar: document.getElementById('editEstateCity').value,
         status: document.getElementById('editEstateStatus').value,
         featured: document.getElementById('editEstateFeatured').value === 'true',
+        link: document.getElementById('editEstateLink').value,
         images: images
     };
     
@@ -1310,19 +1322,21 @@ function showCompanyDetails(companyId) {
                     imageSrc = localImage;
                 }
             }
+            const logoLink = company.logo_url && company.logo_url.startsWith('http') ? company.logo_url : '';
             const modal = document.createElement('div');
             modal.className = 'modal show';
             modal.innerHTML = `
                 <div class="modal-content">
                     <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
                     <h2>${company.name_ar}</h2>
-                    <img src="${imageSrc}" alt="${company.name_ar}" class="detail-image">
+                    ${logoLink ? `<a href="${logoLink}" target="_blank" rel="noopener"><img src="${imageSrc}" alt="${company.name_ar}" class="detail-image"></a>` : `<img src="${imageSrc}" alt="${company.name_ar}" class="detail-image">`}
                     <div class="detail-info">
                         <p>${company.description_ar || ''}</p>
-                        <p><strong>الهاتف:</strong> ${company.phone}</p>
-                        <p><strong>الواتساب:</strong> ${company.whatsapp || 'غير متوفر'}</p>
+                        <p><strong>الهاتف:</strong> <a href="tel:${company.phone}">${company.phone}</a></p>
+                        <p><strong>الواتساب:</strong> ${company.whatsapp ? `<a href="https://wa.me/${company.whatsapp}" target="_blank" rel="noopener">${company.whatsapp}</a>` : 'غير متوفر'}</p>
                         <p><strong>المدينة:</strong> ${company.city_ar}</p>
                         <p><strong>التقييم:</strong> ★ ${company.rating || 0}</p>
+                        ${company.link ? `<p><strong>الموقع:</strong> <a href="${company.link}" target="_blank" rel="noopener">${company.link}</a></p>` : ''}
                     </div>
                 </div>
             `;
@@ -1342,6 +1356,21 @@ function showEstateDetails(estateId) {
                     imageSrc = localImage;
                 }
             }
+            // Build images gallery
+            let imagesHtml = '';
+            if (estate.images && estate.images.length > 0) {
+                imagesHtml = estate.images.map((img, index) => {
+                    let imgSrc = img;
+                    if (img.startsWith('image_')) {
+                        const localImage = database.getImageFromStorage(img);
+                        if (localImage) imgSrc = localImage;
+                    }
+                    const imgLink = img.startsWith('http') ? img : '';
+                    return imgLink 
+                        ? `<a href="${imgLink}" target="_blank" rel="noopener"><img src="${imgSrc}" alt="صورة ${index + 1}" class="detail-gallery-img" onerror="this.style.display='none'"></a>`
+                        : `<img src="${imgSrc}" alt="صورة ${index + 1}" class="detail-gallery-img" onerror="this.style.display='none'">`;
+                }).join('');
+            }
             const modal = document.createElement('div');
             modal.className = 'modal show';
             modal.innerHTML = `
@@ -1349,10 +1378,16 @@ function showEstateDetails(estateId) {
                     <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
                     <h2>${estate.title_ar}</h2>
                     <img src="${imageSrc}" alt="${estate.title_ar}" class="detail-image" onerror="this.src='assets/images/placeholder-estate.svg'">
+                    ${imagesHtml ? `<div class="detail-gallery">${imagesHtml}</div>` : ''}
                     <div class="detail-info">
                         <p>${estate.description_ar || ''}</p>
                         <p><strong>السعر:</strong> ${estate.price?.toLocaleString()} ${estate.currency || 'USD'}</p>
                         <p><strong>المساحة:</strong> ${estate.area || 0} م²</p>
+                        <p><strong>النوع:</strong> ${estate.type || ''}</p>
+                        <p><strong>الغرض:</strong> ${estate.purpose === 'sale' ? 'للبيع' : estate.purpose === 'rent' ? 'للإيجار' : estate.purpose || ''}</p>
+                        <p><strong>المدينة:</strong> ${estate.city_ar || ''}</p>
+                        <p><strong>الحالة:</strong> ${estate.status === 'available' ? 'متاح' : estate.status === 'sold' ? 'مباع' : estate.status === 'rented' ? 'مؤجر' : estate.status || ''}</p>
+                        ${estate.link ? `<p><strong>الرابط:</strong> <a href="${estate.link}" target="_blank" rel="noopener">${estate.link}</a></p>` : ''}
                     </div>
                 </div>
             `;

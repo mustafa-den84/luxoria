@@ -33,6 +33,7 @@ class CompaniesManager {
                     imageSrc = localImage;
                 }
             }
+            const logoLink = company.logo_url ? (company.logo_url.startsWith('http') ? company.logo_url : imageSrc) : '';
             return `
             <div class="card" onclick="showCompanyDetails('${company.id}')">
                 <img src="${imageSrc}" 
@@ -46,6 +47,7 @@ class CompaniesManager {
                         <span class="card-rating">★ ${company.rating || 0}</span>
                         <span>${company.city_ar || ''}</span>
                     </div>
+                    ${company.link ? `<a href="${company.link}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">🔗 الموقع</a>` : ''}
                 </div>
             </div>
         `}).join('');

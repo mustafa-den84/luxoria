@@ -71,59 +71,59 @@
         font-size: 0.75rem;
     }
 
-    /* City filter group - Blue */
+    /* City filter group - Cyan */
     .filter-card[data-group="cityFilter"] {
-        background: #e8f0fe;
-        border-color: #c5d9f7;
+        background: #e0f7fa;
+        border-color: #80deea;
     }
 
     .filter-card[data-group="cityFilter"].selected {
-        background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
-        border-color: #1a73e8;
+        background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+        border-color: #00bcd4;
     }
 
-    /* Sort filter group - Green */
+    /* Sort filter group - Lime */
     .filter-card[data-group="sortBy"] {
-        background: #e6f4ea;
-        border-color: #b8e0c4;
+        background: #f1f8e9;
+        border-color: #aed581;
     }
 
     .filter-card[data-group="sortBy"].selected {
-        background: linear-gradient(135deg, #1e8e3e 0%, #0d652d 100%);
-        border-color: #1e8e3e;
+        background: linear-gradient(135deg, #8bc34a 0%, #689f38 100%);
+        border-color: #8bc34a;
     }
 
-    /* Type filter group - Orange */
+    /* Type filter group - Coral */
     .filter-card[data-group="typeFilter"] {
-        background: #fef3e0;
-        border-color: #f5c97a;
+        background: #fff3e0;
+        border-color: #ffcc80;
     }
 
     .filter-card[data-group="typeFilter"].selected {
-        background: linear-gradient(135deg, #e8710a 0%, #c05500 100%);
-        border-color: #e8710a;
+        background: linear-gradient(135deg, #ff7043 0%, #f4511e 100%);
+        border-color: #ff7043;
     }
 
     /* Purpose filter group - Pink */
     .filter-card[data-group="purposeFilter"] {
-        background: #fce8f3;
-        border-color: #f5a3c4;
+        background: #fce4ec;
+        border-color: #f48fb1;
     }
 
     .filter-card[data-group="purposeFilter"].selected {
-        background: linear-gradient(135deg, #d81b60 0%, #a00037 100%);
-        border-color: #d81b60;
+        background: linear-gradient(135deg, #ec407a 0%, #c2185b 100%);
+        border-color: #ec407a;
     }
 
-    /* Price sort filter group - Purple */
+    /* Price sort filter group - Violet */
     .filter-card[data-group="priceSort"] {
-        background: #f3e8fd;
-        border-color: #d1a3f5;
+        background: #ede7f6;
+        border-color: #b39ddb;
     }
 
     .filter-card[data-group="priceSort"].selected {
-        background: linear-gradient(135deg, #7b1fa2 0%, #4a0072 100%);
-        border-color: #7b1fa2;
+        background: linear-gradient(135deg, #7e57c2 0%, #5e35b1 100%);
+        border-color: #7e57c2;
     }
     
     /* Grid */

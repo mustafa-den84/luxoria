@@ -46,6 +46,7 @@ class EstatesManager {
                         <span class="card-price">${estate.price?.toLocaleString()} ${estate.currency || 'USD'}</span>
                         <span>${estate.area || 0} م²</span>
                     </div>
+                    ${estate.link ? `<a href="${estate.link}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">🔗 الرابط</a>` : ''}
                 </div>
             </div>
         `}).join('');
@@ -104,6 +105,7 @@ class EstatesManager {
                         <span class="card-price">${estate.price?.toLocaleString()} ${estate.currency || 'USD'}</span>
                         <span>${estate.city_ar || ''}</span>
                     </div>
+                    ${estate.link ? `<a href="${estate.link}" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">🔗 الرابط</a>` : ''}
                 </div>
             </div>
         `}).join('');
