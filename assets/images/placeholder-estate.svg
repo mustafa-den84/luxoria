@@ -1,4 +1,22 @@
 <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
-  <rect width="400" height="300" fill="#FF6B6B"/>
-  <text x="200" y="150" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">عقار فاخر</text>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#e94560"/>
+      <stop offset="100%" style="stop-color:#ff7043"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <rect x="0" y="0" width="400" height="4" fill="url(#accent)"/>
+  <!-- House icon -->
+  <g transform="translate(200,110)">
+    <polygon points="0,-40 50,0 40,0 40,30 -40,30 -40,0 -50,0" fill="none" stroke="#e94560" stroke-width="2.5" opacity="0.8"/>
+    <rect x="-12" y="5" width="24" height="25" fill="none" stroke="#e94560" stroke-width="2" opacity="0.6"/>
+    <rect x="15" y="-10" width="15" height="15" fill="none" stroke="#e94560" stroke-width="1.5" opacity="0.5"/>
+  </g>
+  <text x="200" y="185" font-family="Tajawal, Arial, sans-serif" font-size="22" font-weight="bold" fill="#e94560" text-anchor="middle">عقار فاخر</text>
+  <text x="200" y="215" font-family="Tajawal, Arial, sans-serif" font-size="13" fill="#667eea" text-anchor="middle" opacity="0.7">Luxoria Real Estate</text>
 </svg>
