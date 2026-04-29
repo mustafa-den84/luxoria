@@ -686,11 +686,7 @@ async function loadAdminData() {
         document.getElementById('companiesList').innerHTML = companies.length === 0
             ? '<p class="no-items">لا توجد شركات حالياً</p>'
             : companies.map(company => {
-                let logoSrc = company.logo_url || 'assets/images/placeholder-company.svg';
-                if (company.logo_url && company.logo_url.startsWith('image_')) {
-                    const localImage = database.getImageFromStorage(company.logo_url);
-                    if (localImage) logoSrc = localImage;
-                }
+                let logoSrc = database.resolveImageUrl(company.logo_url) || 'assets/images/placeholder-company.svg';
                 return `
             <div class="user-item company-item">
                 <div class="item-thumbnail">
@@ -712,14 +708,7 @@ async function loadAdminData() {
         document.getElementById('estatesList').innerHTML = estates.length === 0
             ? '<p class="no-items">لا توجد عقارات حالياً</p>'
             : estates.map(estate => {
-                let imageSrc = 'assets/images/placeholder-estate.svg';
-                if (estate.images && estate.images.length > 0) {
-                    imageSrc = estate.images[0];
-                    if (imageSrc.startsWith('image_')) {
-                        const localImage = database.getImageFromStorage(imageSrc);
-                        if (localImage) imageSrc = localImage;
-                    }
-                }
+                let imageSrc = database.resolveFirstImage(estate.images) || 'assets/images/placeholder-estate.svg';
                 return `<div class="user-item estate-item">
                 <div class="item-thumbnail">
                     <img src="${imageSrc}" alt="${estate.title_ar}" onerror="this.src='assets/images/placeholder-estate.svg'">
@@ -1048,6 +1037,19 @@ async function handleEditCompany(event, companyId) {
 
     let logo_url = logoUrlInput;
 
+    // If no new logo provided, check if existing one is a broken localStorage key
+    if (!logoFile && !logoUrlInput) {
+        const existingCompany = await database.getCompanyById(companyId);
+        if (existingCompany?.logo_url) {
+            if (existingCompany.logo_url.startsWith('image_') && !localStorage.getItem(existingCompany.logo_url)) {
+                // Broken localStorage key - clear it
+                logo_url = '';
+            } else {
+                logo_url = existingCompany.logo_url;
+            }
+        }
+    }
+
     // Upload file if provided
     if (logoFile) {
         try {
@@ -1111,8 +1113,9 @@ function editEstate(estateId) {
     database.getEstateById(estateId).then(estate => {
         if (estate) {
             let imagesHtml = '';
-            if (estate.images && estate.images.length > 0) {
-                imagesHtml = estate.images.map((img, index) => {
+            const validImages = database.filterBrokenImages(estate.images);
+            if (validImages.length > 0) {
+                imagesHtml = validImages.map((img, index) => {
                     const imgSrc = database.resolveImageUrl(img);
                     return imgSrc ? `<img src="${imgSrc}" alt="صورة ${index + 1}" style="max-width: 150px; border-radius: 10px; margin: 5px;" onerror="this.style.display='none'">` : '';
                 }).join('');
@@ -1194,7 +1197,7 @@ async function handleEditEstate(event, estateId) {
 
     // Get existing estate data to preserve current images
     const existingEstate = await database.getEstateById(estateId);
-    let images = existingEstate ? existingEstate.images : [];
+    let images = existingEstate ? database.filterBrokenImages(existingEstate.images) : [];
 
     // Add new images from URL input
     if (imagesInput) {
@@ -1398,11 +1401,12 @@ function showCompanyDetails(companyId) {
 function showEstateDetails(estateId) {
     database.getEstateById(estateId).then(estate => {
         if (estate) {
-            const imageSrc = database.resolveImageUrl(estate.images?.[0]) || 'assets/images/placeholder-estate.svg';
+            const imageSrc = database.resolveFirstImage(estate.images) || 'assets/images/placeholder-estate.svg';
             // Build images gallery
             let imagesHtml = '';
-            if (estate.images && estate.images.length > 0) {
-                imagesHtml = estate.images.map((img, index) => {
+            const validImages = database.filterBrokenImages(estate.images);
+            if (validImages.length > 0) {
+                imagesHtml = validImages.map((img, index) => {
                     const imgSrc = database.resolveImageUrl(img);
                     if (!imgSrc) return '';
                     const isLinkable = img.startsWith('http');

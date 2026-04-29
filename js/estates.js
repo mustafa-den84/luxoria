@@ -25,9 +25,7 @@ class EstatesManager {
         }
 
         container.innerHTML = this.estates.map(estate => {
-            const rawUrl = estate.images?.[0];
-            const imageSrc = database.resolveImageUrl(rawUrl) || 'assets/images/placeholder-estate.svg';
-            console.log('Estate:', estate.title_ar, '| images:', JSON.stringify(estate.images), '| first:', rawUrl, '| resolved:', imageSrc);
+            const imageSrc = database.resolveFirstImage(estate.images) || 'assets/images/placeholder-estate.svg';
             return `
             <div class="card" onclick="showEstateDetails('${estate.id}')">
                 <img src="${imageSrc}" 
@@ -79,7 +77,7 @@ class EstatesManager {
         }
 
         container.innerHTML = estates.map(estate => {
-            const imageSrc = database.resolveImageUrl(estate.images?.[0]) || 'assets/images/placeholder-estate.svg';
+            const imageSrc = database.resolveFirstImage(estate.images) || 'assets/images/placeholder-estate.svg';
             return `
             <div class="card" onclick="showEstateDetails('${estate.id}')">
                 <img src="${imageSrc}" 

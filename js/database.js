@@ -379,6 +379,27 @@ class Database {
         return url;
     }
 
+    // Resolve the first working image from an array (skips broken localStorage keys)
+    resolveFirstImage(images) {
+        if (!images || !Array.isArray(images) || images.length === 0) return '';
+        for (const img of images) {
+            const resolved = this.resolveImageUrl(img);
+            if (resolved) return resolved;
+        }
+        return '';
+    }
+
+    // Filter out broken localStorage keys from an images array
+    filterBrokenImages(images) {
+        if (!images || !Array.isArray(images)) return [];
+        return images.filter(img => {
+            if (img && img.startsWith('image_') && !localStorage.getItem(img)) {
+                return false;
+            }
+            return true;
+        });
+    }
+
     // Clear old images from localStorage
     clearOldImages() {
         const keys = [];
