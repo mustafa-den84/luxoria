@@ -406,6 +406,7 @@ async function handleAddCompany(event) {
             const timestamp = Date.now();
             const path = `companies/logos/${timestamp}_${logoFile.name}`;
             logo_url = await database.uploadImage(logoFile, path);
+            console.log('Add company - uploaded logo URL:', logo_url);
             showSuccess('تم رفع الصورة بنجاح');
         } catch (error) {
             console.error('Upload error:', error);
@@ -521,6 +522,7 @@ async function handleAddEstate(event) {
                 const timestamp = Date.now();
                 const path = `estates/images/${timestamp}_${i}_${imageFiles[i].name}`;
                 const url = await database.uploadImage(imageFiles[i], path);
+                console.log('Add estate - uploaded image URL:', url);
                 images.push(url);
             }
             showSuccess('تم رفع الصور بنجاح');
@@ -1052,6 +1054,7 @@ async function handleEditCompany(event, companyId) {
             const timestamp = Date.now();
             const path = `companies/logos/${timestamp}_${logoFile.name}`;
             logo_url = await database.uploadImage(logoFile, path);
+            console.log('Edit company - uploaded logo URL:', logo_url);
             showSuccess('تم رفع الصورة بنجاح');
         } catch (error) {
             console.error('Upload error:', error);
@@ -1206,6 +1209,7 @@ async function handleEditEstate(event, estateId) {
                 const timestamp = Date.now();
                 const path = `estates/images/${timestamp}_${i}_${imageFiles[i].name}`;
                 const url = await database.uploadImage(imageFiles[i], path);
+                console.log('Edit estate - uploaded image URL:', url);
                 images.push(url);
             }
             showSuccess('تم رفع الصور بنجاح');

@@ -297,7 +297,16 @@ class Database {
 
             const data = await response.json();
             // Return the raw GitHub URL for direct image access
-            return data.content.download_url;
+            const downloadUrl = data.content?.download_url;
+            console.log('GitHub upload success:', { path: githubPath, downloadUrl });
+            if (!downloadUrl) {
+                console.error('GitHub upload response missing download_url:', data);
+                // Construct the raw URL manually as fallback
+                const manualUrl = `https://raw.githubusercontent.com/${this.githubRepo}/${this.githubBranch}/${githubPath}`;
+                console.log('Using constructed URL:', manualUrl);
+                return manualUrl;
+            }
+            return downloadUrl;
         } catch (error) {
             console.error('GitHub upload error:', error);
             throw error;
