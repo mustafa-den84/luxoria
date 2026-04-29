@@ -31,7 +31,7 @@ class CompaniesManager {
                 <img src="${imageSrc}" 
                      alt="${company.name_ar}" 
                      class="card-image"
-                     onerror="this.src='assets/images/placeholder-company.svg'">
+                     onerror="if(!this.dataset.retried){this.dataset.retried='1';setTimeout(()=>{this.src=this.src;},2000);}else{this.src='assets/images/placeholder-company.svg';}">
                 <div class="card-content">
                     <h3 class="card-title">${company.name_ar}</h3>
                     <p class="card-description">${company.description_ar || ''}</p>

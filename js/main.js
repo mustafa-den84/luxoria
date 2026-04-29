@@ -1413,7 +1413,7 @@ function showEstateDetails(estateId) {
                 <div class="modal-content">
                     <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
                     <h2>${estate.title_ar}</h2>
-                    <img src="${imageSrc}" alt="${estate.title_ar}" class="detail-image" onerror="this.src='assets/images/placeholder-estate.svg'">
+                    <img src="${imageSrc}" alt="${estate.title_ar}" class="detail-image" onerror="if(!this.dataset.retried){this.dataset.retried='1';setTimeout(()=>{this.src=this.src;},2000);}else{this.src='assets/images/placeholder-estate.svg';}">
                     ${imagesHtml ? `<div class="detail-gallery">${imagesHtml}</div>` : ''}
                     <div class="detail-info">
                         <p>${estate.description_ar || ''}</p>

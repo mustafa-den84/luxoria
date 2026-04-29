@@ -31,7 +31,7 @@ class EstatesManager {
                 <img src="${imageSrc}" 
                      alt="${estate.title_ar}" 
                      class="card-image"
-                     onerror="this.src='assets/images/placeholder-estate.svg'">
+                     onerror="if(!this.dataset.retried){this.dataset.retried='1';setTimeout(()=>{this.src=this.src;},2000);}else{this.src='assets/images/placeholder-estate.svg';}">
                 <div class="card-content">
                     <h3 class="card-title">${estate.title_ar}</h3>
                     <p class="card-description">${estate.description_ar || ''}</p>
@@ -83,7 +83,7 @@ class EstatesManager {
                 <img src="${imageSrc}" 
                      alt="${estate.title_ar}" 
                      class="card-image"
-                     onerror="this.src='assets/images/placeholder-estate.svg'">
+                     onerror="if(!this.dataset.retried){this.dataset.retried='1';setTimeout(()=>{this.src=this.src;},2000);}else{this.src='assets/images/placeholder-estate.svg';}">
                 <div class="card-content">
                     <h3 class="card-title">${estate.title_ar}</h3>
                     <p class="card-description">${estate.description_ar || ''}</p>
